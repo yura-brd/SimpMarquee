@@ -1,6 +1,6 @@
-var u = Object.defineProperty;
-var m = (r, s, e) => s in r ? u(r, s, { enumerable: !0, configurable: !0, writable: !0, value: e }) : r[s] = e;
-var t = (r, s, e) => m(r, typeof s != "symbol" ? s + "" : s, e);
+var c = Object.defineProperty;
+var u = (r, s, e) => s in r ? c(r, s, { enumerable: !0, configurable: !0, writable: !0, value: e }) : r[s] = e;
+var t = (r, s, e) => u(r, typeof s != "symbol" ? s + "" : s, e);
 const n = {
   css: "simp_marquee--css",
   cssStart: "simp_marquee--css_start",
@@ -10,7 +10,7 @@ const n = {
   draggable: "simp_marquee--draggable",
   vertical: "simp_marquee--vertical"
 };
-class d {
+class h {
   constructor(s, e) {
     t(this, "localInitError", !1);
     t(this, "props");
@@ -84,24 +84,7 @@ class d {
     this.wrapper = void 0, this.container = void 0, this.items = void 0;
   }
 }
-class h {
-  static start() {
-    this.isAnimating || (this.isAnimating = !0, this.animate());
-  }
-  static animate() {
-    this.instances.forEach((s) => {
-      s.isCanNextStep && s.move();
-    }), requestAnimationFrame(this.animate.bind(this));
-  }
-  static register(s) {
-    this.instances.push(s), this.start();
-  }
-  static unregister(s) {
-    this.instances = this.instances.filter((e) => e !== s);
-  }
-}
-t(h, "instances", []), t(h, "isAnimating", !1);
-class v extends d {
+class p extends h {
   constructor(e) {
     super(e, "js");
     t(this, "isCanNextStep", !0);
@@ -140,11 +123,11 @@ class v extends d {
     });
     t(this, "velocity", 0);
     t(this, "animationFrameInertia", null);
-    !this.localInitError && (this.initSetSetting(), this.init(), h.register(this));
+    !this.localInitError && (this.initSetSetting(), this.init());
   }
   initSetSetting() {
-    const { speed: e = 8, isObserverPause: i = !1 } = this.props, { isInertia: a = !0, inertiaFriction: o = 0.95, inertiaThreshold: l = 10, inertiaAfterPause: c = 300 } = this.props;
-    this.isObserverPause = i, this.speed = e * 10, this.inertiaAfterPause = c, this.isInertia = a, o >= 0.8 && o <= 0.99 && (this.inertiaFriction = o), this.inertiaThreshold = l;
+    const { speed: e = 8, isObserverPause: i = !0 } = this.props, { isInertia: a = !0, inertiaFriction: o = 0.95, inertiaThreshold: d = 10, inertiaAfterPause: l = 300 } = this.props;
+    this.isObserverPause = i, this.speed = e * 10, this.inertiaAfterPause = l, this.isInertia = a, o >= 0.8 && o <= 0.99 && (this.inertiaFriction = o), this.inertiaThreshold = d;
   }
   init() {
     this.handlerMousemoveBind = this.handlerMousemove.bind(this), this.handlerMouseupBind = this.handlerMouseup.bind(this), this.animateNextStepBind = this.animateNextStep.bind(this), this.handlerTouchMoveBind = this.handlerTouchMove.bind(this), this.handlerTouchEndBind = this.handlerTouchEnd.bind(this), this.mouseEnterHandlerBind = this.mouseEnterHandler.bind(this), this.mouseLeaveHandlerBind = this.mouseLeaveHandler.bind(this), this.mouseDownHandlerBind = this.mouseDownHandler.bind(this), this.touchStartHandlerBind = this.touchStartHandler.bind(this), this.requestId = requestAnimationFrame(this.animateNextStepBind), this.initSize(), this.setInitItems(), this.isObserverPause && (this.callbackObserverBind = this.callbackObserver.bind(this), this.observer = new IntersectionObserver(this.callbackObserverBind, this.observerOptions), this.observer.observe(this.wrapper)), this.container.addEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.addEventListener("mouseleave", this.mouseLeaveHandlerBind), this.container.addEventListener("mousedown", this.mouseDownHandlerBind), this.container.addEventListener("touchstart", this.touchStartHandlerBind), this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
@@ -175,11 +158,11 @@ class v extends d {
     this.isDragging = !1, this.moveEndHandler(), this.startInertia(), document.removeEventListener("touchmove", this.handlerTouchMoveBind), document.removeEventListener("touchend", this.handlerTouchEndBind);
   }
   handlerMousemove(e) {
-    if (console.log("ss"), !this.isDragging)
+    if (!this.isDragging)
       return;
     this.isAddedDraggableClass || (this.wrapper.classList.add(n.draggable), this.isAddedDraggableClass = !0);
     const i = this.getClientPosition(e) - this.initialMousePosition;
-    this.velocity = i, this.addTextStepDirection(i, !0), this.initialMousePosition = this.getClientPosition(e);
+    this.velocity = i, this.addTextStepDirection(i), this.initialMousePosition = this.getClientPosition(e);
   }
   getClientPosition(e) {
     return e instanceof MouseEvent ? this.isVertical ? e.clientY : e.clientX : this.isVertical ? e.touches[0].clientY : e.touches[0].clientX;
@@ -226,12 +209,12 @@ class v extends d {
     const i = (e - this.animationStart) / 1e3 * this.speed;
     this.addTextStepPX(i), this.animationStart = e, this.requestId = requestAnimationFrame(this.animateNextStepBind);
   }
-  addTextStepDirection(e, i = !1) {
-    const a = this.direction === "left" || this.direction === "top" ? -1 : 1;
-    this.addTextStepPX(e * a, i);
+  addTextStepDirection(e) {
+    const i = this.direction === "left" || this.direction === "top" ? -1 : 1;
+    this.addTextStepPX(e * i);
   }
-  addTextStepPX(e, i = !1) {
-    this.direction === "left" || this.direction === "top" ? this.nextStepPX -= e : this.nextStepPX += e, Math.abs(this.nextStepPX) > this.sizeItems && (this.nextStepPX = 0), i && this.move();
+  addTextStepPX(e) {
+    this.direction === "left" || this.direction === "top" ? this.nextStepPX -= e : this.nextStepPX += e, Math.abs(this.nextStepPX) > this.sizeItems && (this.nextStepPX = 0), this.move();
   }
   move() {
     const e = this.isVertical ? "translateY" : "translateX";
@@ -253,7 +236,7 @@ class v extends d {
     this.destroyBase(), this.inertiaClear(), this.requestId && window.cancelAnimationFrame(this.requestId), this.container.removeEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.removeEventListener("mouseleave", this.mouseLeaveHandlerBind), this.container.removeEventListener("mousedown", this.mouseDownHandlerBind), this.container.removeEventListener("touchstart", this.touchStartHandlerBind), document.removeEventListener("mouseup", this.handlerMouseupBind), document.removeEventListener("mousemove", this.handlerMousemoveBind), document.removeEventListener("touchmove", this.handlerTouchMoveBind), document.removeEventListener("touchend", this.handlerTouchEndBind), this.observer && this.observer.disconnect(), delete this.handlerMousemoveBind, delete this.handlerMouseupBind, delete this.handlerTouchMoveBind, delete this.handlerTouchEndBind, delete this.mouseEnterHandlerBind, delete this.mouseLeaveHandlerBind, delete this.mouseDownHandlerBind, delete this.touchStartHandlerBind, delete this.animateNextStepBind, this.destroyAfter();
   }
 }
-class S extends d {
+class v extends h {
   constructor(s) {
     super(s, "css"), !this.localInitError && (this.initSetSetting(), this.init());
   }
@@ -268,6 +251,6 @@ class S extends d {
   }
 }
 export {
-  v as SimpMarquee,
-  S as SimpMarqueeCSS
+  p as SimpMarquee,
+  v as SimpMarqueeCSS
 };

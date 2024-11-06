@@ -1,7 +1,7 @@
 import { ISimpMarqueeProps } from './simpMarquee.types';
 import { SimpMarqueeBase } from './SimpMarqueeBase';
 declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
-    isCanNextStep: boolean;
+    private isCanNextStep;
     private nextStepPX;
     private animationStart;
     private initialMousePosition;
@@ -55,7 +55,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private animateNextStep;
     private addTextStepDirection;
     private addTextStepPX;
-    move(): void;
+    private move;
     private cancelAnimationFrameInertia;
     stop(): void;
     start(): void;
