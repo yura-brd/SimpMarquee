@@ -39,8 +39,12 @@ export default defineConfig({
           src: normalizePath(path.resolve(__dirname, './src/style.css')),
           dest: normalizePath(path.resolve(__dirname, './docs'))      // Копируем её в выходную директорию
         },
+        // {
+        //   src: 'index.html',
+        //   dest: normalizePath(path.resolve(__dirname, './docs'))      // Копируем её в выходную директорию
+        // },
         {
-          src: 'index.html',
+          src: normalizePath(path.resolve(__dirname, './dist/simp-marquee.umd.js')),
           dest: normalizePath(path.resolve(__dirname, './docs'))      // Копируем её в выходную директорию
         },
       ]
