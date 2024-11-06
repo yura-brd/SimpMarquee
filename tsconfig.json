@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+
+		// Создание декларационных файлов
+		"outDir": "./dist",              // Папка для скомпилированных JS файлов
+		"rootDir": "./src",              // Папка с исходными файлами TS
+		"declaration": true,            // Создание декларационных файлов
+		"declarationDir": "./types",    // Папка для деклараций
+		"emitDeclarationOnly": false,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+	"include": ["src/**/*.ts"],       // Включаем все TS-файлы из папки src
+
+	"exclude": ["node_modules", "dist"], // Исключаем папки node_modules и dist
+
+}

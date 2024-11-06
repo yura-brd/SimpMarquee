@@ -1,0 +1,60 @@
+.simp_marquee {
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	user-select: none;
+}
+.simp_marquee:not(.simp_marquee--vertical) {
+	width: 100%;
+}
+.simp_marquee--vertical {
+	width: auto;
+}
+
+.simp_marquee__container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	will-change: transform;
+}
+.simp_marquee--vertical .simp_marquee__container {
+	flex-direction: column;
+}
+
+.simp_marquee__items {
+	list-style-type: none;
+	margin: 0;
+	display: flex;
+	align-items: center;
+
+}
+.simp_marquee--vertical .simp_marquee__items {
+	flex-direction: column;
+}
+
+.simp_marquee--draggable .simp_marquee__item {
+	pointer-events: none;
+}
+
+/** CSS version */
+.simp_marquee--css .simp_marquee__container {
+	overflow: hidden;
+}
+.simp_marquee--css:hover .simp_marquee__items {
+	animation-play-state: paused;
+}
+.simp_marquee--css_start .simp_marquee__items {
+	animation: var(--simpq-speed, 5s) infinite linear simpMarqueeCss;
+}
+
+@keyframes simpMarqueeCss {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(-100%);
+	}
+}

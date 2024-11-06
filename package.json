@@ -1,0 +1,44 @@
+{
+	"name": "simp-marquee",
+	"homepage": "",
+	"author": "Yurii Kopot <yura.brd@gmail.com>",
+	"keywords": [],
+	"version": "1.0.0",
+	"license": "ISC",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"dev": "vite",
+		"dev-host": "vite --host",
+		"build": "tsc && vite build",
+		"preview": "vite preview",
+		"lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
+	},
+	"main": "./dist/simpMarquee.umd.js",
+	"module": "./dist/simpMarquee.es.js",
+	"types": "./dist/types/lib/main.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/types/lib/main.d.ts",
+			"import": "./dist/simpMarquee.es.js",
+			"require": "./dist/simpMarquee.umd.js"
+		},
+		"./style.css": "./dist/simpMarquee.css"
+	},
+	"devDependencies": {
+		"@rushstack/eslint-patch": "^1.1.2",
+		"@types/node": "^18.0.5",
+		"autoprefixer": "^10.4.4",
+		"eslint": "^8.5.0",
+		"prettier": "^2.5.1",
+		"rollup-plugin-friendly-type-imports": "^1.0.2",
+		"ts-node": "^10.7.0",
+		"typescript": "^5.5.4",
+		"vite": "^5.4.3",
+		"vite-plugin-copy": "^0.1.6",
+		"vite-plugin-static-copy": "^1.0.6",
+		"vite-tsconfig-paths": "^5.0.1"
+	}
+}

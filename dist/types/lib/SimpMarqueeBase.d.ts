@@ -1,0 +1,32 @@
+import { ISimpMarqueeCssProps, ISimpMarqueeProps, TDirection, TTypeSimpMarquee } from './simpMarquee.types';
+export declare class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps> {
+    protected localInitError: boolean;
+    protected props: T;
+    protected direction: TDirection;
+    protected isVertical: boolean;
+    protected handlerResizeBind: () => void;
+    typeSimpMarquee: 'css' | 'js';
+    resultFullSize: number;
+    protected wrapper: HTMLElement;
+    protected container: HTMLElement;
+    protected items: HTMLElement;
+    protected sizeWrapper: number;
+    protected sizeItems: number;
+    protected sizeContainer: number;
+    protected cloneWith: number;
+    MAX_COUNT_CLONE: number;
+    CURRENT_COUNT_CLONE: number;
+    constructor(props: T, typeSimpMarquee: TTypeSimpMarquee);
+    protected initBase(): void;
+    private setLocalInitError;
+    protected debounce(func: any, delay: number): (...args: any[]) => void;
+    protected initSize(): void;
+    protected handlerResize(): void;
+    updateSize(): void;
+    protected setSizeContainer(): void;
+    protected setInitItems(): void;
+    protected reinitItems(): void;
+    protected addCloneDom(isStart: boolean): void;
+    protected destroyBase(): void;
+    protected destroyAfter(): void;
+}
