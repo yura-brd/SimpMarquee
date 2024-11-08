@@ -25,13 +25,13 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
   private idSetTimeoutStartInertia: number | null  = null
 
 
-  private handlerMousemoveBind!: (e: MouseEvent) => void;
-  private handlerMouseupBind!: (e: MouseEvent) => void;
+  private handlerMouseMoveBind!: (e: MouseEvent) => void;
+  // private handlerMouseupBind!: (e: MouseEvent) => void;
 
   private handlerTouchMoveBind!: (e: TouchEvent) => void;
-  private handlerTouchEndBind!: (e: TouchEvent) => void;
+  // private handlerTouchEndBind!: (e: TouchEvent) => void;
   private mouseEnterHandlerBind!: () => void;
-  private mouseLeaveHandlerBind!: () => void;
+  // private mouseLeaveHandlerBind!: () => void;
   private mouseDownHandlerBind!: (e: MouseEvent) => void;
   private touchStartHandlerBind!: (e: TouchEvent) => void;
 
@@ -46,6 +46,7 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     threshold: 0 // процент видимости (0.5 означает 50% элемента должно быть видно)
   };
 
+  private readonly isTouchDevice = 'ontouchstart' in window;
 
   private velocity = 0;
   private animationFrameInertia: number | null = null;
@@ -79,18 +80,17 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
   }
   private init() {
 
-    this.handlerMousemoveBind = this.handlerMousemove.bind(this);
-    this.handlerMouseupBind = this.handlerMouseup.bind(this);
+    this.handlerMouseMoveBind = this.handlerMouseMove.bind(this);
+    // this.handlerMouseupBind = this.handlerMouseup.bind(this);
     this.animateNextStepBind = this.animateNextStep.bind(this);
 
     this.handlerTouchMoveBind = this.handlerTouchMove.bind(this);
-    this.handlerTouchEndBind = this.handlerTouchEnd.bind(this);
+    // this.handlerTouchEndBind = this.handlerTouchEnd.bind(this);
     this.mouseEnterHandlerBind = this.mouseEnterHandler.bind(this);
-    this.mouseLeaveHandlerBind = this.mouseLeaveHandler.bind(this);
+    // this.mouseLeaveHandlerBind = this.mouseLeaveHandler.bind(this);
     this.mouseDownHandlerBind = this.mouseDownHandler.bind(this);
     this.touchStartHandlerBind = this.touchStartHandler.bind(this);
 
-    this.requestId = requestAnimationFrame(this.animateNextStepBind);
 
     this.initSize();
     this.setInitItems();
@@ -101,12 +101,20 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
       this.observer.observe(this.wrapper);
     }
 
+    // start auto scrolling
+    this.requestId = requestAnimationFrame(this.animateNextStepBind);
+
+    // hover in
     this.container.addEventListener('mouseenter', this.mouseEnterHandlerBind);
-    this.container.addEventListener('mouseleave', this.mouseLeaveHandlerBind);
+
+    // click
     this.container.addEventListener('mousedown', this.mouseDownHandlerBind);
 
-    // Touch events for mobile
-    this.container.addEventListener('touchstart', this.touchStartHandlerBind);
+    if (this.isTouchDevice) {
+      // Touch events for mobile
+      this.container.addEventListener('touchstart', this.touchStartHandlerBind);
+    }
+
 
     this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
   }
@@ -127,17 +135,25 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
   mouseEnterHandler() {
     this.moveHandlerStart();
     this.inertiaClear();
+    // this.container.addEventListener('mouseleave', this.mouseLeaveHandlerBind);
+    this.container.addEventListener('mouseleave', () => {
+      this.mouseLeaveHandler()
+    }, { once: true });
   }
   mouseLeaveHandler() {
     if(!this.isDragging) {
       this.moveEndHandler();
     }
+    // this.container.removeEventListener('mouseleave', this.mouseLeaveHandlerBind);
   }
   mouseDownHandler(e: MouseEvent) {
     this.isDragging = true;
     this.initialMousePosition = this.getClientPosition(e);
-    document.addEventListener('mouseup', this.handlerMouseupBind);
-    document.addEventListener('mousemove', this.handlerMousemoveBind);
+    // document.addEventListener('mouseup', this.handlerMouseupBind);
+    document.addEventListener('mouseup', (e) => {
+      this.handlerMouseup(e);
+    }, { once: true });
+    document.addEventListener('mousemove', this.handlerMouseMoveBind);
   }
   touchStartHandler(e: TouchEvent) {
     e.preventDefault();
@@ -147,7 +163,10 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     this.inertiaClear();
 
     document.addEventListener('touchmove', this.handlerTouchMoveBind);
-    document.addEventListener('touchend', this.handlerTouchEndBind);
+    // document.addEventListener('touchend', this.handlerTouchEndBind);
+    document.addEventListener('touchend', () => {
+      this.handlerTouchEnd();
+    }, {once: true });
   }
 
 
@@ -166,10 +185,10 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     this.startInertia();
 
     document.removeEventListener('touchmove', this.handlerTouchMoveBind);
-    document.removeEventListener('touchend', this.handlerTouchEndBind);
+    // document.removeEventListener('touchend', this.handlerTouchEndBind);
   }
 
-  private handlerMousemove(e: MouseEvent) {
+  private handlerMouseMove(e: MouseEvent) {
     if (!this.isDragging) {
       return;
     }
@@ -195,8 +214,8 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     this.wrapper.classList.remove(CLASSES.draggable);
     this.isAddedDraggableClass = false;
 
-    document.removeEventListener('mouseup', this.handlerMouseupBind);
-    document.removeEventListener('mousemove', this.handlerMousemoveBind);
+    // document.removeEventListener('mouseup', this.handlerMouseupBind);
+    document.removeEventListener('mousemove', this.handlerMouseMoveBind);
 
     this.requestId = requestAnimationFrame(this.animateNextStepBind);
 
@@ -274,7 +293,7 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
       return;
     }
 
-    // if ((timestamp -  (this.animationStart || 0) ) < 1000 / 30) {
+    // if ((timestamp -  (this.animationStart || 0) ) < 1000 / 10) {
     //   this.requestId = requestAnimationFrame(this.animateNextStepBind);
     //   return;
     // }
@@ -290,21 +309,22 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
 
     const elapsed = (timestamp - this.animationStart ) / 1000 * this.speed;
 
-    this.addTextStepPX(elapsed);
+    this.addTextStepPX(this.numberFormatRound(elapsed));
+    // this.addTextStepPX(1);
 
     this.animationStart = timestamp;
     this.requestId = requestAnimationFrame(this.animateNextStepBind);
   }
 
   private addTextStepDirection(pos: number) {
-    const isMinus = this.direction === 'left' || this.direction === 'top'  ? -1 : 1
+    const isMinus = this.direction === 'left' || this.direction === 'top'  ? -1 : 1;
     this.addTextStepPX(pos * isMinus);
   }
   private addTextStepPX(pos: number) {
     if (this.direction === 'left' || this.direction === 'top') {
-      this.nextStepPX -= pos;
+      this.nextStepPX = this.numberFormatRound(this.nextStepPX - pos);
     } else {
-      this.nextStepPX += pos;
+      this.nextStepPX = this.numberFormatRound(this.nextStepPX + pos);
     }
 
     if(Math.abs(this.nextStepPX) > this.sizeItems) {
@@ -325,6 +345,9 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     // } else {
     //   this.wrapper.scrollLeft = this.nextStepPX * -1;
     // }
+  }
+  private numberFormatRound(number: number) {
+    return Math.round(number * 1000) / 1000
   }
 
   private cancelAnimationFrameInertia() {
@@ -353,28 +376,28 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     this.inertiaClear();
     this.requestId && window.cancelAnimationFrame(this.requestId);
     this.container.removeEventListener('mouseenter', this.mouseEnterHandlerBind);
-    this.container.removeEventListener('mouseleave', this.mouseLeaveHandlerBind);
+    // this.container.removeEventListener('mouseleave', this.mouseLeaveHandlerBind);
     this.container.removeEventListener('mousedown', this.mouseDownHandlerBind);
     this.container.removeEventListener('touchstart', this.touchStartHandlerBind);
-    document.removeEventListener('mouseup', this.handlerMouseupBind);
-    document.removeEventListener('mousemove', this.handlerMousemoveBind);
+    // document.removeEventListener('mouseup', this.handlerMouseupBind);
+    document.removeEventListener('mousemove', this.handlerMouseMoveBind);
     document.removeEventListener('touchmove', this.handlerTouchMoveBind);
-    document.removeEventListener('touchend', this.handlerTouchEndBind);
+    // document.removeEventListener('touchend', this.handlerTouchEndBind);
 
     this.observer && this.observer.disconnect();
 
     // @ts-ignore
-    delete this.handlerMousemoveBind;
+    delete this.handlerMouseMoveBind;
     // @ts-ignore
-    delete this.handlerMouseupBind;
+    // delete this.handlerMouseupBind;
     // @ts-ignore
     delete this.handlerTouchMoveBind;
     // @ts-ignore
-    delete this.handlerTouchEndBind;
+    // delete this.handlerTouchEndBind;
     // @ts-ignore
     delete this.mouseEnterHandlerBind;
     // @ts-ignore
-    delete this.mouseLeaveHandlerBind;
+    // delete this.mouseLeaveHandlerBind;
     // @ts-ignore
     delete this.mouseDownHandlerBind;
     // @ts-ignore

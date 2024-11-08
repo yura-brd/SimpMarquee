@@ -14,12 +14,9 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private inertiaThreshold;
     private inertiaAfterPause;
     private idSetTimeoutStartInertia;
-    private handlerMousemoveBind;
-    private handlerMouseupBind;
+    private handlerMouseMoveBind;
     private handlerTouchMoveBind;
-    private handlerTouchEndBind;
     private mouseEnterHandlerBind;
-    private mouseLeaveHandlerBind;
     private mouseDownHandlerBind;
     private touchStartHandlerBind;
     private animateNextStepBind;
@@ -31,6 +28,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
         rootMargin: string;
         threshold: number;
     };
+    private readonly isTouchDevice;
     private velocity;
     private animationFrameInertia;
     constructor(props: ISimpMarqueeProps);
@@ -43,7 +41,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     touchStartHandler(e: TouchEvent): void;
     private handlerTouchMove;
     private handlerTouchEnd;
-    private handlerMousemove;
+    private handlerMouseMove;
     private getClientPosition;
     private handlerMouseup;
     private startInertia;
@@ -56,6 +54,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private addTextStepDirection;
     private addTextStepPX;
     private move;
+    private numberFormatRound;
     private cancelAnimationFrameInertia;
     stop(): void;
     start(): void;
