@@ -1,21 +1,24 @@
 import { SimpMarquee, SimpMarqueeCSS } from './lib/main';
-
+new SimpMarquee({
+  wrapperSelector: '.js_simp_marquee_3',
+  speed: 15
+})
 // @ts-ignore
 window['aa'] = new SimpMarquee({
   wrapperSelector: '.js_simp_marquee_1',
-  speed: 5,
+  speed: 10,
   cloneWith: 1,
   isObserverPause: true
 })
-
-const init = false;
+new SimpMarquee({
+  wrapperSelector: '.js_simp_marquee_2',
+  speed: 8,
+  direction: 'right',
+})
+const init = 1;
 
 if (init) {
-  new SimpMarquee({
-    wrapperSelector: '.js_simp_marquee_2',
-    speed: 8,
-    direction: 'right',
-  })
+
   new SimpMarquee({
     wrapperSelector: '.js_simp_marquee_3',
     speed: 15

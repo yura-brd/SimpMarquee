@@ -48,8 +48,6 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
   private velocity = 0;
   private animationFrameInertia: number | null = null;
 
-
-
   constructor(props: ISimpMarqueeProps) {
     super(props, 'js');
 
@@ -87,7 +85,9 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
 
 
     this.initSize();
+    // this.setInitItemsInit();
     this.setInitItems();
+    this.setInitPosition();
 
     if (this.isObserverPause) {
       this.callbackObserverBind = this.callbackObserver.bind(this);
@@ -112,7 +112,10 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
 
     this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
   }
-
+  protected setInitPosition() {
+    this.nextStepPX = this.startInitPosition;
+    this.move();
+  }
   callbackObserver(entries: IntersectionObserverEntry[]) {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -164,7 +167,7 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     if (!this.isDragging) return;
     const deltaX = this.getClientPosition(e) - this.initialMousePosition;
     this.velocity = deltaX;  // Обновляем скорость
-    this.addTextStepDirection(deltaX);
+    this.addNextStepDirection(deltaX);
     this.initialMousePosition = this.getClientPosition(e);
   }
   private handlerTouchEnd() {
@@ -187,7 +190,7 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     }
     const deltaX = this.getClientPosition(e) - this.initialMousePosition;
     this.velocity = deltaX;  // Обновляем скорость
-    this.addTextStepDirection(deltaX);
+    this.addNextStepDirection(deltaX);
     this.initialMousePosition = this.getClientPosition(e);
   }
   private getClientPosition(e: MouseEvent | TouchEvent) {
@@ -227,7 +230,7 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
 
       this.moveHandlerStart(false); // set pause after inertia
 
-      this.addTextStepDirection(this.velocity)
+      this.addNextStepDirection(this.velocity)
       this.velocity *= this.inertiaFriction; // Замедление скорости
 
       if (Math.abs(this.velocity) > 0.5) {
@@ -281,16 +284,6 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
       return;
     }
 
-    // if ((timestamp -  (this.animationStart || 0) ) < 1000 / 10) {
-    //   this.requestId = requestAnimationFrame(this.animateNextStepBind);
-    //   return;
-    // }
-
-    if ((this.nextStepPX * -1) >= this.sizeItems) {
-      this.nextStepPX = this.sizeItems - (this.nextStepPX * -1);
-      this.animationStart = null
-    }
-
     if (!this.animationStart) {
       this.animationStart = timestamp;
     }
@@ -304,9 +297,12 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     this.requestId = requestAnimationFrame(this.animateNextStepBind);
   }
 
-  private addTextStepDirection(pos: number) {
+  private getDirectionPosition(pos: number) {
     const isMinus = this.direction === 'left' || this.direction === 'top'  ? -1 : 1;
-    this.addTextStepPX(pos * isMinus);
+    return pos * isMinus;
+  }
+  private addNextStepDirection(pos: number) {
+    this.addTextStepPX(this.getDirectionPosition(pos));
   }
   private addTextStepPX(pos: number) {
     if (this.direction === 'left' || this.direction === 'top') {
@@ -315,24 +311,23 @@ class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
       this.nextStepPX = this.numberFormatRound(this.nextStepPX + pos);
     }
 
-    if(Math.abs(this.nextStepPX) > this.sizeItems) {
-      this.nextStepPX = 0;
+   const startInitPositionCurrent = this.nextStepPX + Math.abs(this.startInitPosition);
+    const isNeedUpdate = Math.abs(startInitPositionCurrent) > Math.max(this.sizeWrapper, this.sizeItems);
+    if (isNeedUpdate) {
+      // this.nextStepPX = startInitPositionCurrent < 0 ? this.nextStepPX + this.sizeItems : this.nextStepPX - this.sizeItems;
+      this.nextStepPX += this.numberFormatRound((startInitPositionCurrent < 0 ? 1 : -1) * this.sizeItems);
+      this.animationStart = null
     }
+
+    // if(Math.abs(this.nextStepPX) > this.sizeItems) {
+      // this.nextStepPX = 0;
+    // }
     this.move()
 
   }
   private move() {
     const position = this.isVertical ? 'translateY' : 'translateX';
     this.container.style.transform = `${position}(${this.nextStepPX}px)`;
-    // if (this.nextStepPX * -1 < 0) {
-    //   // console.log(this.wrapper);
-    //   // console.log(this.nextStepPX * -1);
-    // }
-    // if (this.isVertical) {
-    //   this.wrapper.scrollTop = this.nextStepPX * -1;
-    // } else {
-    //   this.wrapper.scrollLeft = this.nextStepPX * -1;
-    // }
   }
   private numberFormatRound(number: number) {
     return Math.round(number * 1000) / 1000

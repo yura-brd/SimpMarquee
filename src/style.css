@@ -2,12 +2,11 @@
 	overflow: hidden;
 	position: relative;
 	display: flex;
-	justify-content: center;
-	width: 100%;
 	user-select: none;
 }
 .simp_marquee:not(.simp_marquee--vertical) {
 	width: 100%;
+	max-width: 100%;
 }
 .simp_marquee--vertical {
 	width: auto;
@@ -16,7 +15,6 @@
 .simp_marquee__container {
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	will-change: transform;
 }
 .simp_marquee--vertical .simp_marquee__container {

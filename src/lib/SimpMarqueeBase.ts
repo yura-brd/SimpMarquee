@@ -24,6 +24,7 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
   protected sizeContainer!: number;
 
   protected cloneWith = 3;
+  protected startInitPosition = 0;
 
   MAX_COUNT_CLONE = 100;
   CURRENT_COUNT_CLONE = 1;
@@ -90,15 +91,16 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
   }
   protected handlerResize() {
     this.updateSize();
+    // this.setInitItemsInit();
     this.reinitItems();
   }
   public updateSize() {
     if (this.isVertical) {
-      this.sizeWrapper = this.wrapper.scrollHeight;
+      this.sizeWrapper = this.wrapper.offsetHeight;
       this.sizeItems = this.items.scrollHeight;
       this.sizeContainer = this.container.scrollHeight;
     } else {
-      this.sizeWrapper = this.wrapper.scrollWidth;
+      this.sizeWrapper = this.wrapper.offsetWidth;
       this.sizeItems = this.items.scrollWidth;
       this.sizeContainer = this.container.scrollWidth;
     }
@@ -107,11 +109,11 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
     } else {
       this.resultFullSize = Math.max(this.sizeWrapper, this.sizeItems) * this.cloneWith
     }
+    this.startInitPosition = Math.max(this.sizeWrapper, this.sizeItems) * -1
   }
   protected setSizeContainer() {
     this.sizeContainer = this.isVertical ? this.container.scrollHeight : this.container.scrollWidth;
   }
-
   protected setInitItems() {
     const isCSS = this.typeSimpMarquee === 'css';
 
@@ -138,9 +140,10 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
       }
     }
   }
-  protected addCloneDom(isStart: boolean) {
+  private addCloneDom(isStart: boolean) {
     const cloneItems = this.items.cloneNode(true) as HTMLElement;
-    cloneItems.classList.add(CLASSES.clone, isStart ? CLASSES.cloneStart : CLASSES.cloneEnd);
+    const posClass = (isStart ? CLASSES.cloneStart : CLASSES.cloneEnd);
+    cloneItems.classList.add(CLASSES.clone, posClass);
 
     if (isStart) {
       this.container.prepend(cloneItems);
