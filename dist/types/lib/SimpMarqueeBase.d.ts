@@ -14,6 +14,7 @@ export declare class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqu
     protected sizeItems: number;
     protected sizeContainer: number;
     protected cloneWith: number;
+    protected startInitPosition: number;
     MAX_COUNT_CLONE: number;
     CURRENT_COUNT_CLONE: number;
     constructor(props: T, typeSimpMarquee: TTypeSimpMarquee);
@@ -26,7 +27,7 @@ export declare class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqu
     protected setSizeContainer(): void;
     protected setInitItems(): void;
     protected reinitItems(): void;
-    protected addCloneDom(isStart: boolean): void;
+    private addCloneDom;
     protected destroyBase(): void;
     protected destroyAfter(): void;
 }

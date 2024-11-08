@@ -26,6 +26,7 @@ class h {
     e(this, "sizeItems");
     e(this, "sizeContainer");
     e(this, "cloneWith", 3);
+    e(this, "startInitPosition", 0);
     e(this, "MAX_COUNT_CLONE", 100);
     e(this, "CURRENT_COUNT_CLONE", 1);
     this.props = s;
@@ -60,7 +61,7 @@ class h {
     this.updateSize(), this.reinitItems();
   }
   updateSize() {
-    this.isVertical ? (this.sizeWrapper = this.wrapper.scrollHeight, this.sizeItems = this.items.scrollHeight, this.sizeContainer = this.container.scrollHeight) : (this.sizeWrapper = this.wrapper.scrollWidth, this.sizeItems = this.items.scrollWidth, this.sizeContainer = this.container.scrollWidth), this.typeSimpMarquee === "css" ? this.resultFullSize = this.sizeWrapper * this.cloneWith : this.resultFullSize = Math.max(this.sizeWrapper, this.sizeItems) * this.cloneWith;
+    this.isVertical ? (this.sizeWrapper = this.wrapper.offsetHeight, this.sizeItems = this.items.scrollHeight, this.sizeContainer = this.container.scrollHeight) : (this.sizeWrapper = this.wrapper.offsetWidth, this.sizeItems = this.items.scrollWidth, this.sizeContainer = this.container.scrollWidth), this.typeSimpMarquee === "css" ? this.resultFullSize = this.sizeWrapper * this.cloneWith : this.resultFullSize = Math.max(this.sizeWrapper, this.sizeItems) * this.cloneWith, this.startInitPosition = Math.max(this.sizeWrapper, this.sizeItems) * -1;
   }
   setSizeContainer() {
     this.sizeContainer = this.isVertical ? this.container.scrollHeight : this.container.scrollWidth;
@@ -74,8 +75,8 @@ class h {
     }, 40)));
   }
   addCloneDom(s) {
-    const t = this.items.cloneNode(!0);
-    t.classList.add(n.clone, s ? n.cloneStart : n.cloneEnd), s ? this.container.prepend(t) : this.container.append(t);
+    const t = this.items.cloneNode(!0), i = s ? n.cloneStart : n.cloneEnd;
+    t.classList.add(n.clone, i), s ? this.container.prepend(t) : this.container.append(t);
   }
   destroyBase() {
     this.container.querySelectorAll(`.${n.clone}`).forEach((t) => t.remove()), window.removeEventListener("resize", this.handlerResizeBind);
@@ -102,11 +103,8 @@ class p extends h {
     e(this, "inertiaAfterPause", 300);
     e(this, "idSetTimeoutStartInertia", null);
     e(this, "handlerMouseMoveBind");
-    // private handlerMouseupBind!: (e: MouseEvent) => void;
     e(this, "handlerTouchMoveBind");
-    // private handlerTouchEndBind!: (e: TouchEvent) => void;
     e(this, "mouseEnterHandlerBind");
-    // private mouseLeaveHandlerBind!: () => void;
     e(this, "mouseDownHandlerBind");
     e(this, "touchStartHandlerBind");
     e(this, "animateNextStepBind");
@@ -131,7 +129,10 @@ class p extends h {
     this.isObserverPause = i, this.speed = t * 10, this.inertiaAfterPause = d, this.isInertia = a, o >= 0.8 && o <= 0.99 && (this.inertiaFriction = o), this.inertiaThreshold = l;
   }
   init() {
-    this.handlerMouseMoveBind = this.handlerMouseMove.bind(this), this.animateNextStepBind = this.animateNextStep.bind(this), this.handlerTouchMoveBind = this.handlerTouchMove.bind(this), this.mouseEnterHandlerBind = this.mouseEnterHandler.bind(this), this.mouseDownHandlerBind = this.mouseDownHandler.bind(this), this.touchStartHandlerBind = this.touchStartHandler.bind(this), this.initSize(), this.setInitItems(), this.isObserverPause && (this.callbackObserverBind = this.callbackObserver.bind(this), this.observer = new IntersectionObserver(this.callbackObserverBind, this.observerOptions), this.observer.observe(this.wrapper)), this.requestId = requestAnimationFrame(this.animateNextStepBind), this.container.addEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.addEventListener("mousedown", this.mouseDownHandlerBind), this.isTouchDevice && this.container.addEventListener("touchstart", this.touchStartHandlerBind), this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
+    this.handlerMouseMoveBind = this.handlerMouseMove.bind(this), this.animateNextStepBind = this.animateNextStep.bind(this), this.handlerTouchMoveBind = this.handlerTouchMove.bind(this), this.mouseEnterHandlerBind = this.mouseEnterHandler.bind(this), this.mouseDownHandlerBind = this.mouseDownHandler.bind(this), this.touchStartHandlerBind = this.touchStartHandler.bind(this), this.initSize(), this.setInitItems(), this.setInitPosition(), this.isObserverPause && (this.callbackObserverBind = this.callbackObserver.bind(this), this.observer = new IntersectionObserver(this.callbackObserverBind, this.observerOptions), this.observer.observe(this.wrapper)), this.requestId = requestAnimationFrame(this.animateNextStepBind), this.container.addEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.addEventListener("mousedown", this.mouseDownHandlerBind), this.isTouchDevice && this.container.addEventListener("touchstart", this.touchStartHandlerBind), this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
+  }
+  setInitPosition() {
+    this.nextStepPX = this.startInitPosition, this.move();
   }
   callbackObserver(t) {
     t.forEach((i) => {
@@ -159,7 +160,7 @@ class p extends h {
   handlerTouchMove(t) {
     if (!this.isDragging) return;
     const i = this.getClientPosition(t) - this.initialMousePosition;
-    this.velocity = i, this.addTextStepDirection(i), this.initialMousePosition = this.getClientPosition(t);
+    this.velocity = i, this.addNextStepDirection(i), this.initialMousePosition = this.getClientPosition(t);
   }
   handlerTouchEnd() {
     this.isDragging = !1, this.moveEndHandler(), this.startInertia(), document.removeEventListener("touchmove", this.handlerTouchMoveBind);
@@ -169,7 +170,7 @@ class p extends h {
       return;
     this.isAddedDraggableClass || (this.wrapper.classList.add(n.draggable), this.isAddedDraggableClass = !0);
     const i = this.getClientPosition(t) - this.initialMousePosition;
-    this.velocity = i, this.addTextStepDirection(i), this.initialMousePosition = this.getClientPosition(t);
+    this.velocity = i, this.addNextStepDirection(i), this.initialMousePosition = this.getClientPosition(t);
   }
   getClientPosition(t) {
     return t instanceof MouseEvent ? this.isVertical ? t.clientY : t.clientX : this.isVertical ? t.touches[0].clientY : t.touches[0].clientX;
@@ -185,7 +186,7 @@ class p extends h {
   requestInertia() {
     let t = !0;
     const i = () => {
-      if (this.idSetTimeoutStartInertia && window.clearTimeout(this.idSetTimeoutStartInertia), this.moveHandlerStart(!1), this.addTextStepDirection(this.velocity), this.velocity *= this.inertiaFriction, Math.abs(this.velocity) > 0.5)
+      if (this.idSetTimeoutStartInertia && window.clearTimeout(this.idSetTimeoutStartInertia), this.moveHandlerStart(!1), this.addNextStepDirection(this.velocity), this.velocity *= this.inertiaFriction, Math.abs(this.velocity) > 0.5)
         t = !0, this.animationFrameInertia = requestAnimationFrame(i);
       else {
         if (t = !1, this.cancelAnimationFrameInertia(), !this.isCanNextStep)
@@ -212,16 +213,21 @@ class p extends h {
   animateNextStep(t) {
     if (!this.isCanNextStep || this.animationFrameInertia)
       return;
-    this.nextStepPX * -1 >= this.sizeItems && (this.nextStepPX = this.sizeItems - this.nextStepPX * -1, this.animationStart = null), this.animationStart || (this.animationStart = t);
+    this.animationStart || (this.animationStart = t);
     const i = (t - this.animationStart) / 1e3 * this.speed;
     this.addTextStepPX(this.numberFormatRound(i)), this.animationStart = t, this.requestId = requestAnimationFrame(this.animateNextStepBind);
   }
-  addTextStepDirection(t) {
+  getDirectionPosition(t) {
     const i = this.direction === "left" || this.direction === "top" ? -1 : 1;
-    this.addTextStepPX(t * i);
+    return t * i;
+  }
+  addNextStepDirection(t) {
+    this.addTextStepPX(this.getDirectionPosition(t));
   }
   addTextStepPX(t) {
-    this.direction === "left" || this.direction === "top" ? this.nextStepPX = this.numberFormatRound(this.nextStepPX - t) : this.nextStepPX = this.numberFormatRound(this.nextStepPX + t), Math.abs(this.nextStepPX) > this.sizeItems && (this.nextStepPX = 0), this.move();
+    this.direction === "left" || this.direction === "top" ? this.nextStepPX = this.numberFormatRound(this.nextStepPX - t) : this.nextStepPX = this.numberFormatRound(this.nextStepPX + t);
+    const i = this.nextStepPX + Math.abs(this.startInitPosition);
+    Math.abs(i) > Math.max(this.sizeWrapper, this.sizeItems) && (this.nextStepPX += this.numberFormatRound((i < 0 ? 1 : -1) * this.sizeItems), this.animationStart = null), this.move();
   }
   move() {
     const t = this.isVertical ? "translateY" : "translateX";
@@ -246,7 +252,7 @@ class p extends h {
     this.destroyBase(), this.inertiaClear(), this.requestId && window.cancelAnimationFrame(this.requestId), this.container.removeEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.removeEventListener("mousedown", this.mouseDownHandlerBind), this.container.removeEventListener("touchstart", this.touchStartHandlerBind), document.removeEventListener("mousemove", this.handlerMouseMoveBind), document.removeEventListener("touchmove", this.handlerTouchMoveBind), this.observer && this.observer.disconnect(), delete this.handlerMouseMoveBind, delete this.handlerTouchMoveBind, delete this.mouseEnterHandlerBind, delete this.mouseDownHandlerBind, delete this.touchStartHandlerBind, delete this.animateNextStepBind, this.destroyAfter();
   }
 }
-class S extends h {
+class v extends h {
   constructor(s) {
     super(s, "css"), !this.localInitError && (this.initSetSetting(), this.init());
   }
@@ -262,5 +268,5 @@ class S extends h {
 }
 export {
   p as SimpMarquee,
-  S as SimpMarqueeCSS
+  v as SimpMarqueeCSS
 };

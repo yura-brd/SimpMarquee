@@ -34,6 +34,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     constructor(props: ISimpMarqueeProps);
     private initSetSetting;
     private init;
+    protected setInitPosition(): void;
     callbackObserver(entries: IntersectionObserverEntry[]): void;
     mouseEnterHandler(): void;
     mouseLeaveHandler(): void;
@@ -51,7 +52,8 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private moveHandlerStart;
     private moveEndHandler;
     private animateNextStep;
-    private addTextStepDirection;
+    private getDirectionPosition;
+    private addNextStepDirection;
     private addTextStepPX;
     private move;
     private numberFormatRound;
