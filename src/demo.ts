@@ -1,7 +1,7 @@
 import { SimpMarquee, SimpMarqueeCSS } from './lib/main';
 new SimpMarquee({
   wrapperSelector: '.js_simp_marquee_3',
-  speed: 15
+  speed: 3
 })
 // @ts-ignore
 window['aa'] = new SimpMarquee({
@@ -19,10 +19,7 @@ const init = 1;
 
 if (init) {
 
-  new SimpMarquee({
-    wrapperSelector: '.js_simp_marquee_3',
-    speed: 15
-  })
+
 
   new SimpMarquee({
     wrapperSelector: '.js_simp_marquee_vertical_1',

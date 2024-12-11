@@ -1,11 +1,6 @@
-export const TEXTS_STATUS = {
-  success: 'success',
-  validationError: 'validation_error',
-  error: 'error',
-}
-
 export const CLASSES = {
   'css': 'simp_marquee--css',
+  'start': 'simp_marquee--start',
   'cssStart': 'simp_marquee--css_start',
   'clone': 'simp_marquee-clone',
   'cloneStart': 'simp_marquee--clone_start',

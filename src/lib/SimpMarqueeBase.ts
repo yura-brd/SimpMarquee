@@ -12,6 +12,8 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
 
   typeSimpMarquee: 'css' | 'js' = 'js';
 
+  protected isCSS = false;
+
   resultFullSize = 0;
 
 
@@ -35,6 +37,9 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
     const { wrapperSelector} = this.props;
 
     this.typeSimpMarquee = typeSimpMarquee;
+    if (this.typeSimpMarquee === 'css') {
+      this.isCSS = true;
+    }
     if (typeof wrapperSelector === 'string') {
       this.wrapper = document.querySelector(wrapperSelector) as HTMLElement;
     } else {
@@ -59,13 +64,15 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
   }
 
   protected initBase() {
-    const { direction = 'left', cloneWith= 3 } = this.props;
+    const { direction = 'left', cloneWith } = this.props;
     this.direction = direction;
     if (this.direction === 'top' || this.direction === 'bottom') {
       this.isVertical = true;
     }
 
-    this.cloneWith = cloneWith;
+    if (!cloneWith) {
+      this.cloneWith = this.isCSS ? 2 : 3;
+    }
 
     if (this.isVertical && !this.wrapper.classList.contains(CLASSES.vertical)) {
       this.wrapper.classList.add(CLASSES.vertical)
@@ -104,7 +111,7 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
       this.sizeItems = this.items.scrollWidth;
       this.sizeContainer = this.container.scrollWidth;
     }
-    if (this.typeSimpMarquee === 'css') {
+    if (this.isCSS) {
       this.resultFullSize = this.sizeWrapper * this.cloneWith;
     } else {
       this.resultFullSize = Math.max(this.sizeWrapper, this.sizeItems) * this.cloneWith
@@ -114,25 +121,70 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
   protected setSizeContainer() {
     this.sizeContainer = this.isVertical ? this.container.scrollHeight : this.container.scrollWidth;
   }
+  protected setInitItemsHalf() {
+    //   const listItems = this.items.querySelectorAll('li');
+    //
+    //   const halfIndex = Math.ceil(listItems.length / 2);
+    //
+    //   const firstHalf = Array.from(listItems).slice(0, halfIndex);
+    //   const secondHalf = Array.from(listItems).slice(halfIndex - 1);
+    //
+    //   const createList = (items: any) => {
+    //     const ul = document.createElement('ul');
+    //     ul.className = this.items.className;
+    //     items.forEach((item: any) => {
+    //       const li = item.cloneNode(true);
+    //       ul.appendChild(li);
+    //     });
+    //     return ul;
+    //   }
+    //
+    //   const firstList = createList(firstHalf);
+    //   const secondList = createList(secondHalf);
+    //
+    //   this.container.appendChild(firstList);
+    //   this.container.prepend(secondList);
+    //
+    //   this.startInitPosition = secondList.offsetWidth;
+    //   return;
+  }
   protected setInitItems() {
-    const isCSS = this.typeSimpMarquee === 'css';
-
-    if (!isCSS) {
-      this.addCloneDom(true);
+    // if (!this.isCSS && this.sizeItems > this.sizeWrapper * this.cloneWith) {
+    //   this.setInitItemsHalf()
+    //   return;
+    // }
+    const minClone = this.isCSS ? 1 : 2;
+    const countClone = Math.min(Math.max(Math.ceil(this.resultFullSize / this.sizeItems) - 1, minClone), this.MAX_COUNT_CLONE);
+    let cloneItems: DocumentFragment | null = document.createDocumentFragment();
+    for (let i = 0; i < countClone; i++) {
+      // if (!this.isCSS) {
+      //   this.addCloneDom(true);
+      // }
+      cloneItems.appendChild(this.addCloneDom(false));
     }
-    this.addCloneDom(false);
-    this.setSizeContainer();
-
-    this.CURRENT_COUNT_CLONE += 1;
-
-    if (this.sizeContainer < this.resultFullSize && this.CURRENT_COUNT_CLONE < this.MAX_COUNT_CLONE) {
-      this.setInitItems();
+    if (cloneItems) {
+      this.container.appendChild(cloneItems)
     }
+    cloneItems = null;
+
+    // if (!this.isCSS) {
+    //   this.addCloneDom(true);
+    // }
+    // this.addCloneDom(false);
+    // this.setSizeContainer();
+    //
+    // this.CURRENT_COUNT_CLONE += 1;
+    //
+    //
+    //
+    // if (this.sizeContainer < this.resultFullSize && this.CURRENT_COUNT_CLONE < this.MAX_COUNT_CLONE) {
+    //   this.setInitItems();
+    // }
   }
   protected reinitItems() {
     if (this.sizeContainer < this.resultFullSize) {
       this.setInitItems();
-      if(this.typeSimpMarquee === 'css') {
+      if(this.isCSS) {
         this.wrapper.classList.remove(CLASSES.cssStart);
         setTimeout(() => {
           this.wrapper.classList.add(CLASSES.cssStart);
@@ -140,16 +192,17 @@ export class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqueeProps>
       }
     }
   }
-  private addCloneDom(isStart: boolean) {
+  private addCloneDom(_isStart: boolean): HTMLElement {
     const cloneItems = this.items.cloneNode(true) as HTMLElement;
-    const posClass = (isStart ? CLASSES.cloneStart : CLASSES.cloneEnd);
-    cloneItems.classList.add(CLASSES.clone, posClass);
-
-    if (isStart) {
-      this.container.prepend(cloneItems);
-    } else {
-      this.container.append(cloneItems);
-    }
+    // const posClass = (isStart ? CLASSES.cloneStart : CLASSES.cloneEnd);
+    cloneItems.classList.add(CLASSES.clone);
+    return cloneItems;
+    // this.container.appendChild(cloneItems);
+    // if (isStart) {
+    //   this.container.appendChild(cloneItems);
+    // } else {
+    //   this.container.appendChild(cloneItems);
+    // }
   }
 
   protected destroyBase() {

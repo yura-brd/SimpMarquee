@@ -6,6 +6,7 @@ export declare class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqu
     protected isVertical: boolean;
     protected handlerResizeBind: () => void;
     typeSimpMarquee: 'css' | 'js';
+    protected isCSS: boolean;
     resultFullSize: number;
     protected wrapper: HTMLElement;
     protected container: HTMLElement;
@@ -25,6 +26,7 @@ export declare class SimpMarqueeBase<T extends ISimpMarqueeCssProps | ISimpMarqu
     protected handlerResize(): void;
     updateSize(): void;
     protected setSizeContainer(): void;
+    protected setInitItemsHalf(): void;
     protected setInitItems(): void;
     protected reinitItems(): void;
     private addCloneDom;

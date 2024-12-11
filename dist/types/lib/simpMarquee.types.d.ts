@@ -14,6 +14,7 @@ export interface ISimpMarqueeProps extends ISimpMarqueeBaseProps {
     inertiaThreshold?: number;
     inertiaAfterPause?: number;
     isObserverPause?: boolean;
+    minIntervalFPS?: number;
     callbackInit?: (wrapper: HTMLElement, simpMarquee: SimpMarquee) => void;
 }
 export interface ISimpMarqueeCssProps extends ISimpMarqueeBaseProps {

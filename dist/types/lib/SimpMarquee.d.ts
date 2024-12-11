@@ -7,6 +7,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private initialMousePosition;
     private speed;
     private isDragging;
+    private isMoved;
     private isAddedDraggableClass;
     private requestId;
     private isInertia;
@@ -29,6 +30,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
         threshold: number;
     };
     private readonly isTouchDevice;
+    private minIntervalFPS;
     private velocity;
     private animationFrameInertia;
     constructor(props: ISimpMarqueeProps);
