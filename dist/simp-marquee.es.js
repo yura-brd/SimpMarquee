@@ -1,6 +1,6 @@
-var u = Object.defineProperty;
-var m = (a, s, t) => s in a ? u(a, s, { enumerable: !0, configurable: !0, writable: !0, value: t }) : a[s] = t;
-var e = (a, s, t) => m(a, typeof s != "symbol" ? s + "" : s, t);
+var m = Object.defineProperty;
+var p = (a, s, t) => s in a ? m(a, s, { enumerable: !0, configurable: !0, writable: !0, value: t }) : a[s] = t;
+var e = (a, s, t) => p(a, typeof s != "symbol" ? s + "" : s, t);
 const n = {
   css: "simp_marquee--css",
   start: "simp_marquee--start",
@@ -103,6 +103,7 @@ class S extends h {
     e(this, "speed", 80);
     e(this, "isDragging", !1);
     e(this, "isMoved", !1);
+    e(this, "isWheel", !1);
     e(this, "isAddedDraggableClass", !1);
     e(this, "requestId", null);
     e(this, "isInertia", !0);
@@ -112,6 +113,7 @@ class S extends h {
     e(this, "inertiaAfterPause", 300);
     e(this, "idSetTimeoutStartInertia", null);
     e(this, "handlerMouseMoveBind");
+    e(this, "handlerWheelMoveBind");
     e(this, "handlerTouchMoveBind");
     e(this, "mouseEnterHandlerBind");
     e(this, "mouseDownHandlerBind");
@@ -135,11 +137,11 @@ class S extends h {
     !this.localInitError && (this.initSetSetting(), this.init());
   }
   initSetSetting() {
-    const { speed: t = 8, isObserverPause: i = !0, minIntervalFPS: r = 0 } = this.props, { isInertia: l = !0, inertiaFriction: o = 0.95, inertiaThreshold: d = 10, inertiaAfterPause: c = 300 } = this.props;
-    this.minIntervalFPS = r, this.isObserverPause = i, this.speed = t * 10, this.inertiaAfterPause = c, this.isInertia = l, o >= 0.8 && o <= 0.99 && (this.inertiaFriction = o), this.inertiaThreshold = d;
+    const { speed: t = 8, isObserverPause: i = !0, isWheel: r = !0, minIntervalFPS: l = 0 } = this.props, { isInertia: d = !0, inertiaFriction: o = 0.95, inertiaThreshold: c = 10, inertiaAfterPause: u = 300 } = this.props;
+    this.isWheel = r, this.minIntervalFPS = l, this.isObserverPause = i, this.speed = t * 10, this.inertiaAfterPause = u, this.isInertia = d, o >= 0.8 && o <= 0.99 && (this.inertiaFriction = o), this.inertiaThreshold = c;
   }
   init() {
-    this.handlerMouseMoveBind = this.handlerMouseMove.bind(this), this.animateNextStepBind = this.animateNextStep.bind(this), this.handlerTouchMoveBind = this.handlerTouchMove.bind(this), this.mouseEnterHandlerBind = this.mouseEnterHandler.bind(this), this.mouseDownHandlerBind = this.mouseDownHandler.bind(this), this.touchStartHandlerBind = this.touchStartHandler.bind(this), this.initSize(), this.setInitItems(), this.setInitPosition(), this.isObserverPause && (this.callbackObserverBind = this.callbackObserver.bind(this), this.observer = new IntersectionObserver(this.callbackObserverBind, this.observerOptions), this.observer.observe(this.wrapper)), this.requestId = requestAnimationFrame(this.animateNextStepBind), this.wrapper.classList.add(n.start), this.container.addEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.addEventListener("mousedown", this.mouseDownHandlerBind), this.isTouchDevice && this.container.addEventListener("touchstart", this.touchStartHandlerBind), this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
+    this.handlerMouseMoveBind = this.handlerMouseMove.bind(this), this.handlerWheelMoveBind = this.handlerWheelMove.bind(this), this.animateNextStepBind = this.animateNextStep.bind(this), this.handlerTouchMoveBind = this.handlerTouchMove.bind(this), this.mouseEnterHandlerBind = this.mouseEnterHandler.bind(this), this.mouseDownHandlerBind = this.mouseDownHandler.bind(this), this.touchStartHandlerBind = this.touchStartHandler.bind(this), this.initSize(), this.setInitItems(), this.setInitPosition(), this.isObserverPause && (this.callbackObserverBind = this.callbackObserver.bind(this), this.observer = new IntersectionObserver(this.callbackObserverBind, this.observerOptions), this.observer.observe(this.wrapper)), this.requestId = requestAnimationFrame(this.animateNextStepBind), this.wrapper.classList.add(n.start), this.container.addEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.addEventListener("mousedown", this.mouseDownHandlerBind), this.isTouchDevice && this.container.addEventListener("touchstart", this.touchStartHandlerBind), this.isWheel && this.container.addEventListener("wheel", this.handlerWheelMoveBind), this.props.callbackInit && this.props.callbackInit(this.wrapper, this);
   }
   setInitPosition() {
     this.nextStepPX = this.startInitPosition, this.move();
@@ -175,6 +177,13 @@ class S extends h {
   }
   handlerTouchEnd() {
     this.isDragging = !1, this.moveEndHandler(), this.startInertia(), document.removeEventListener("touchmove", this.handlerTouchMoveBind);
+  }
+  handlerWheelMove(t) {
+    const i = Math.abs(t.deltaX) > Math.abs(t.deltaY);
+    (this.isVertical && !i || !this.isVertical && i) && t.preventDefault(), window.requestAnimationFrame(() => {
+      const r = this.isVertical ? t.deltaY : t.deltaX;
+      this.addNextStepDirection(r);
+    });
   }
   handlerMouseMove(t) {
     if (!this.isDragging)
@@ -247,6 +256,7 @@ class S extends h {
     Math.abs(i) > Math.max(this.sizeWrapper, this.sizeItems) && (this.nextStepPX += this.numberFormatRound((i < 0 ? 1 : -1) * this.sizeItems), this.animationStart = null), this.move();
   }
   move() {
+    this.props.callbackTick && this.props.callbackTick(this.wrapper, this, this.nextStepPX);
     const t = this.isVertical ? "translateY" : "translateX";
     this.container.style.transform = `${t}(${this.nextStepPX}px)`;
   }
@@ -269,7 +279,7 @@ class S extends h {
     this.destroyBase(), this.cancelAnimationFrameInertia(), this.inertiaClear(), this.requestId && window.cancelAnimationFrame(this.requestId), this.container.removeEventListener("mouseenter", this.mouseEnterHandlerBind), this.container.removeEventListener("mousedown", this.mouseDownHandlerBind), this.container.removeEventListener("touchstart", this.touchStartHandlerBind), document.removeEventListener("mousemove", this.handlerMouseMoveBind), document.removeEventListener("touchmove", this.handlerTouchMoveBind), this.observer && this.observer.disconnect(), delete this.handlerMouseMoveBind, delete this.handlerTouchMoveBind, delete this.mouseEnterHandlerBind, delete this.mouseDownHandlerBind, delete this.touchStartHandlerBind, delete this.animateNextStepBind, this.destroyAfter();
   }
 }
-class v extends h {
+class f extends h {
   constructor(s) {
     super(s, "css"), !this.localInitError && (this.initSetSetting(), this.init());
   }
@@ -285,5 +295,5 @@ class v extends h {
 }
 export {
   S as SimpMarquee,
-  v as SimpMarqueeCSS
+  f as SimpMarqueeCSS
 };

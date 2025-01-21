@@ -8,6 +8,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private speed;
     private isDragging;
     private isMoved;
+    private isWheel;
     private isAddedDraggableClass;
     private requestId;
     private isInertia;
@@ -16,6 +17,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     private inertiaAfterPause;
     private idSetTimeoutStartInertia;
     private handlerMouseMoveBind;
+    private handlerWheelMoveBind;
     private handlerTouchMoveBind;
     private mouseEnterHandlerBind;
     private mouseDownHandlerBind;
@@ -44,6 +46,7 @@ declare class SimpMarquee extends SimpMarqueeBase<ISimpMarqueeProps> {
     touchStartHandler(e: TouchEvent): void;
     private handlerTouchMove;
     private handlerTouchEnd;
+    private handlerWheelMove;
     private handlerMouseMove;
     private getClientPosition;
     private handlerMouseup;
